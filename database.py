@@ -38,6 +38,7 @@ def init_database(sound_lib_path, database_path):
                         convert.convert_pdf_to_json(current_file_path, new_file_path)
 
         else:
+        # initialize any other folder found in the root dir of the sound_lib_path
             convert.convert_folder_to_database(current_folder_path, database_path)
 
 

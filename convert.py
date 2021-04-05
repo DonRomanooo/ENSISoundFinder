@@ -9,7 +9,7 @@ from logger import Logger
 
 
 def convert_pdf_to_json(src_file, dest_file):
-    # convert a pdf file to a json file
+    # convert a pdf file to a database usable for SoundFinder
     
     pdf = pdfplumber.open(r"%s" % src_file)
 
@@ -62,7 +62,7 @@ def convert_pdf_to_json(src_file, dest_file):
 
 
 def convert_folder_to_database(folder_path, database_path):
-    # convert a folder to a database usable for ENSISoundLoader
+    # convert a folder to a database usable for ENSISoundFinder
     items = []
     progress = 0
     

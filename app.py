@@ -6,6 +6,8 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 
+import database
+
 class App(QMainWindow):
     # main application
 
@@ -80,7 +82,7 @@ class App(QMainWindow):
         # initialize the application when you run it
         # if you run it for the first time, it will initialize the database
         self.pref_file = os.environ["APPDATA"] + "/ENSISoundLoader/preferences.pref"
-        self.sound_lib_data = os.environ["APPDATA"] + "/ENSISoundLoader/data"
+        self.sound_lib_database = os.environ["APPDATA"] + "/ENSISoundLoader/data"
 
         if not os.path.exists(self.pref_file):
 
@@ -95,12 +97,10 @@ class App(QMainWindow):
             with open(self.pref_file, "w") as f:
                 pref_data = {
                     "SOUND_LIB_PATH" : self.sound_lib_dir,
-                    "DATABASE_PATH" : self.sound_lib_data
+                    "DATABASE_PATH" : self.sound_lib_database
                 }
 
                 json.dump(pref_data, f, indent=2)
-
-        self.database_path = "D:/SoundLoaderTest"
 
         #for file in os.listdir(self.database_path):
 
