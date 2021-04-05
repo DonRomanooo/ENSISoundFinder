@@ -8,13 +8,47 @@ from PyQt5.QtGui import *
 
 import database
 
+
+class Popup(QWidget):
+    def __init__(self, name, has_message=False, message="" ,has_progress_bar=False, has_output_list=False):
+        QWidget.__init__(self)
+
+        self.setWindowTitle(name)
+
+        main_layout = QVBoxLayout()
+
+        self.has_message = has_message
+        self.has_progress_bar = has_progress_bar
+        self.has_output_list = has_output_list
+
+        if has_message:
+            self.message = QLabel(message)
+            main_layout.addWidget(self.message)
+
+        if has_progress_bar:
+            self.progress_bar = QProgressBar(self)
+            main_layout.addWidget(self.progress_bar)
+
+        if has_output_list:
+            self.output_list = QListView()
+            main_layout.addWidget(self.output_list)
+
+        self.setLayout(main_layout)
+
+
+    def set_progress_status(progress):
+        if self.has_progress_bar: self.progress_bar.setValue(progress)
+
+
+    def add_message(msg):
+        if self.has_output_list: self.output_list.append(msg)
+
+
 class App(QMainWindow):
     # main application
 
     def __init__(self):
         QWidget.__init__(self)
-
-        self.initialize()
 
         self.setWindowTitle("ENSI Sound Finder")
 
@@ -69,6 +103,8 @@ class App(QMainWindow):
         
         self.setCentralWidget(main_widget)
 
+        self.popup_window = None
+
     
     def settings_ui(self):
         pass
@@ -81,13 +117,13 @@ class App(QMainWindow):
     def initialize(self):
         # initialize the application when you run it
         # if you run it for the first time, it will initialize the database
-        self.pref_file = os.environ["APPDATA"] + "/ENSISoundLoader/preferences.pref"
-        self.sound_lib_database = os.environ["APPDATA"] + "/ENSISoundLoader/data"
+        self.pref_file = os.environ["APPDATA"] + "/ENSISoundFinder/preferences.pref"
+        self.sound_lib_database = os.environ["APPDATA"] + "/ENSISoundFinder/data"
 
         if not os.path.exists(self.pref_file):
-
             os.umask(770)
             os.makedirs(os.path.dirname(self.pref_file))
+            os.makedirs(self.sound_lib_database)
 
             dlg = QFileDialog()
             dlg.setFileMode(QFileDialog.Directory)
@@ -102,8 +138,13 @@ class App(QMainWindow):
 
                 json.dump(pref_data, f, indent=2)
 
-        #for file in os.listdir(self.database_path):
+            database.init_database(self.sound_lib_dir, self.sound_lib_database)
 
+            
+        self.data = database.load_database(self.sound_lib_database)
+
+
+        
 
 
 
