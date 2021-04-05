@@ -64,9 +64,18 @@ def convert_pdf_to_json(src_file, dest_file):
 def convert_folder_to_database(folder_path, database_path):
     # convert a folder to a database usable for ENSISoundLoader
     items = []
+    progress = 0
     
+    total_files = 0
+
+    for root, dirs, files in os.walk(folder_path, topdown=True):
+        for f in files: total_files += 1
+
+
     for root, dirs, files in os.walk(folder_path, topdown=True):
             for f in files:
+                progress_jump = 100.0 / total_files
+
                 name, extension = os.path.splitext(f)
                 tags = ""
 
@@ -88,9 +97,14 @@ def convert_folder_to_database(folder_path, database_path):
 
                     items.append(item)
 
+                progress += progress_jump
+                progress_out = round(progress)
+
+                if progress_out % 5 == 0 or progress_out == 1:
+                    Logger.console_progress_bar(f"Processing {folder_path} : ", f" {progress_out}%", progress_out, 20)
+
     output_filename = os.path.basename(folder_path) + ".json"
     output_file = os.path.join(database_path, output_filename.lower())
 
     with open(output_file, "w") as f:
         json.dump(items, f, indent=2)
-
