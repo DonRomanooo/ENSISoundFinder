@@ -12,4 +12,4 @@ To install the program, download and use the **install.bat** program, or copy th
 
 When you'll run ENSISoundFinder for the first time, it will initialize its database which you can find in %APPDATA%/ENSISoundFinder/data. Do not modify it or you might corrupt it or delete sounds. If for whatever reason you think the database is not corrupted, just run *Settings/Initialize Database*.
 
-ENSISoundFinder is made for the Ecole des Nouvelles Images sound library only, as it has been coded for its special structure. The role of this application is to find sounds that will match the tags you enter; and then you can play every sound that has been found, and copy the selected ones to your working folder
+ENSISoundFinder is made for the Ecole des Nouvelles Images sound library only, as it has been coded for its special structure. The role of this application is to find sounds that will match the tags you enter; and then you can play every sound that has been found, and copy the selected ones to your working folder.
