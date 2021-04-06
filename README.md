@@ -6,7 +6,7 @@ Small utility application made to be used at my school, Ecole des Nouvelles Imag
 
 ENSISoundFinder uses [Python3.7](https://www.python.org/downloads/release/python-370/), [PyQT5](https://pypi.org/project/PyQt5/), [PDFPlumber](https://pypi.org/project/pdfplumber/0.1.2/) and [PyInstaller](https://pypi.org/project/pyinstaller/). 
 
-To install the program, download and use the **install.bat** program, or copy the folder named **ENSISoundFinder** that has been pushed into *W:/Ressources/ENSISoundFinder* into *C:/Program Files*.
+To install the program, you need to have **Python37** and **Git** installed (for the .bat install file to work). Download and use the **install.bat** program, or copy the folder named **ENSISoundFinder** that has been pushed into *W:/Ressources/ENSISoundFinder* into *C:/Program Files*.
 
 # Documentation
 
