@@ -1,7 +1,6 @@
 # Application #
 
 import sys, os, json, time, shutil, subprocess
-from playsound import playsound
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
