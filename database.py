@@ -6,8 +6,11 @@ import os, json, threading
 import convert
 
 
-def init_database(sound_lib_path, database_path):
+def init_database(sound_lib_path, database_path, **kwargs):
     # initialize the database
+
+    progress_function = kwargs.get("progress", None)
+    message_function = kwargs.get("message", None)
 
     sound_library = os.listdir(sound_lib_path)
 
@@ -38,11 +41,11 @@ def init_database(sound_lib_path, database_path):
 
                         new_file = filename + ".json"
                         new_file_path = os.path.join(database_path, new_file)
-                        convert.convert_pdf_to_json(current_file_path, new_file_path)
+                        convert.convert_pdf_to_json(current_file_path, new_file_path, progress=progress_function, message=message_function)
 
         else:
         # initialize any other folder found in the root dir of the sound_lib_path
-            convert.convert_folder_to_database(current_folder_path, database_path)
+            convert.convert_folder_to_database(current_folder_path, database_path, progress=progress_function, message=message_function)
 
 
 def load_database(database_path, **kwargs):
@@ -58,7 +61,7 @@ def load_database(database_path, **kwargs):
 
     database = []
 
-    for file in files:
+    for file in db_files:
         name, ext = os.path.splitext(file)
 
         if ext != ".json":
@@ -74,7 +77,7 @@ def load_database(database_path, **kwargs):
                 database.append(element)
 
         progress += progress_jump
-        progress_function(progress)
+        if progress_function: progress_function(round(progress))
 
     
     return database
