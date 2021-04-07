@@ -18,6 +18,7 @@ def convert_pdf_to_json(src_file, dest_file, **kwargs):
     message_function = kwargs.get("message", None)
 
     if message_function: message_function(f"Processing {src_file}")
+    Logger.message(f"Processing {src_file}")
 
     items = []
 
@@ -77,7 +78,7 @@ def convert_pdf_to_json(src_file, dest_file, **kwargs):
         if progress_function: progress_function(progress_out)
 
         if progress_out % 5 == 0 or progress_out == 1:
-            Logger.console_progress_bar(f"Processing {src_file} : ", f" {progress_out}%", progress_out, 20)
+            Logger.console_progress_bar(f"Progress : ", f" {progress_out}%", progress_out, 20)
 
     sys.stdout.write("\n")
 
@@ -95,6 +96,7 @@ def convert_folder_to_database(folder_path, database_path, **kwargs):
     message_function = kwargs.get("message", None)
 
     if message_function: message_function(f"Processing {folder_path}")
+    Logger.message(f"Processing {folder_path}")
     
     total_files = 0
 
@@ -133,7 +135,7 @@ def convert_folder_to_database(folder_path, database_path, **kwargs):
                 if progress_function: progress_function(progress_out)
 
                 if progress_out % 5 == 0 or progress_out == 1:
-                    Logger.console_progress_bar(f"Processing {folder_path} : ", f" {progress_out}%", progress_out, 20)
+                    Logger.console_progress_bar(f"Progress : ", f" {progress_out}%", progress_out, 20)
 
     sys.stdout.write("\n")
 
