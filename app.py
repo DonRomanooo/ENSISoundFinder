@@ -93,6 +93,8 @@ class App(QMainWindow):
         # menubar
         menubar = self.menuBar()
         settings_menu = menubar.addMenu("Settings")
+        settings_menu.addAction("Initialize Database")
+        settings_menu.triggered[QAction].connect(self.re_initialize)
         help_menu = menubar.addMenu("Help")
 
         # working dir
@@ -150,6 +152,7 @@ class App(QMainWindow):
     def set_working_dir(self):
         self.current_working_directory = QFileDialog.getExistingDirectory(self, "Select the working directory", "C:/")
         self.working_dir_label.setText(self.current_working_directory)
+        Logger.message(f"Set the current working directory to {self.current_working_directory}")
 
 
     def copy(self):
@@ -168,8 +171,16 @@ class App(QMainWindow):
                         if not new_name.endswith(".wav") : new_name += ".wav"
 
                         copy_filename = os.path.join(dirname, new_name)
+                        
+                        if(os.path.exists(filename)):
+                            shutil.copy(filename, copy_filename)
+                            Logger.message(f"Copied {filename} to {copy_filename}")
 
-                        shutil.copy(filename, copy_filename)
+                        else:
+                            Logger.error(f"Can't copy {filename}, it does not exist")
+
+        else:
+            Logger.warning("No item selected")
 
 
     def open(self):
@@ -184,16 +195,27 @@ class App(QMainWindow):
                         
                         if(os.path.exists(filename)):
                             subprocess.Popen([filename], shell=True)
+                            Logger.message(f"Opened {filename}")
+                        else:
+                            Logger.error(f"Can't open {filename}, it does not exist")
+
+        else:
+            Logger.warning("No item selected")
 
     
     def settings_ui(self):
-        pass
+        print("settings")
 
 
     def search(self):
-        tags = self.input_tags.text().split(" ")
-        self.found_sounds = find.search(self.database, tags)
-        self.update_list()
+        if len(self.database) == 0:
+            Logger.error("Database is empty. Try to reinitalize it using the settings menu and restart ENSISoundLoader")
+
+        else:
+            tags = self.input_tags.text().split(" ")
+            self.found_sounds = find.search(self.database, tags)
+            Logger.message(f"Found {len(self.found_sounds)} sounds matching {tags}")
+            self.update_list()
 
 
     def update_list(self):
@@ -209,13 +231,16 @@ class App(QMainWindow):
         self.pref_file = os.environ["APPDATA"] + "/ENSISoundFinder/preferences.pref"
         self.sound_lib_database = os.environ["APPDATA"] + "/ENSISoundFinder/data"
 
-        self.init_popup = Popup("ENSISoundFinder", has_output_list=True)
-        self.init_popup.setMinimumHeight(600)
-        self.init_popup.setMinimumWidth(250)
+        Logger.message("Starting ENSISoundFinder...")
 
-        self.init_popup.add_message("Initializing ENSISoundFinder...")
+        # self.init_popup = Popup("ENSISoundFinder", has_output_list=True)
+        # self.init_popup.setMinimumHeight(600)
+        # self.init_popup.setMinimumWidth(250)
+
+        # self.init_popup.add_message("Initializing ENSISoundFinder...")
 
         if not os.path.exists(self.pref_file):
+            Logger.message("Creating preference directory")
             os.umask(770)
             os.makedirs(os.path.dirname(self.pref_file))
             os.makedirs(self.sound_lib_database)
@@ -233,34 +258,78 @@ class App(QMainWindow):
 
                 json.dump(pref_data, f, indent=2)
 
-            self.init_popup.add_message("Initializing database...")
+            # self.init_popup.add_message("Initializing database...")
 
-            self.progress_popup = Popup("Progress", has_message=True, message = "Progress", has_progress_bar=True)
-
-            self.init_thread = InitThread(self.sound_lib_dir, self.sound_lib_database, message=self.init_popup.add_message, close_prog=self.progress_popup.close, close_log=self.init_popup.close)
-            self.init_thread.update.connect(self.progress_popup.set_progress_status)
+            # self.progress_popup = Popup("Progress", has_message=True, message = "Progress", has_progress_bar=True)
+            Logger.message("Initializing database...")
+            self.init_thread = InitThread(self.sound_lib_dir, self.sound_lib_database)
+            # self.init_thread.update.connect(self.progress_popup.set_progress_status)
             self.init_thread.finished.connect(self.move_database)
             self.init_thread.start()
+        
+        elif not os.path.exists(self.sound_lib_database):
+            Logger.warning("Database not found, initializing it...")
 
-        else:
-            
+            os.makedirs(self.sound_lib_database)
+
             with open(self.pref_file, "r") as f:
                 data = json.load(f)
 
             self.sound_lib_dir = data["SOUND_LIB_PATH"]
 
-            self.progress_popup = Popup("Progress", has_message=True, message = "Progress", has_progress_bar=True)
-            self.progress_popup.show()
-
-            self.init_thread = InitThread(self.sound_lib_dir, self.sound_lib_database, message=self.init_popup.add_message, close_prog=self.progress_popup.close, close_log=self.init_popup.close, init=False)
-            self.init_thread.update.connect(self.progress_popup.set_progress_status)
+            self.init_thread = InitThread(self.sound_lib_dir, self.sound_lib_database)
             self.init_thread.finished.connect(self.move_database)
             self.init_thread.start()
+
+        else:
+            Logger.message("Loading database...") 
+
+            with open(self.pref_file, "r") as f:
+                data = json.load(f)
+
+            self.sound_lib_dir = data["SOUND_LIB_PATH"]
+
+            # self.progress_popup = Popup("Progress", has_message=True, message = "Progress", has_progress_bar=True)
+            # self.progress_popup.show()
+
+            self.init_thread = InitThread(self.sound_lib_dir, self.sound_lib_database, init=False)
+            # self.init_thread.update.connect(self.progress_popup.set_progress_status)
+            self.init_thread.finished.connect(self.move_database)
+            self.init_thread.start()
+
+
+    def re_initialize(self):
+        # re initialize the database in case you have missing files or corrupted it
+        self.pref_file = os.environ["APPDATA"] + "/ENSISoundFinder/preferences.pref"
+        self.sound_lib_database = os.environ["APPDATA"] + "/ENSISoundFinder/data"
+
+        Logger.message("Reinitializing database...")
+
+        with open(self.pref_file, "r") as f:
+            data = json.load(f)
+
+        self.sound_lib_dir = data["SOUND_LIB_PATH"]
+
+        if os.path.exists(self.sound_lib_database):
+            try:
+                Logger.message("Removing old database...")
+                shutil.rmtree(self.sound_lib_database)
+                os.makedirs(self.sound_lib_database)
+            except Exception as e:
+                Logger.error(e)
+        else:
+            os.makedirs(self.sound_lib_database)
+        
+        Logger.message("Initializing the new database...")
+        self.init_thread = InitThread(self.sound_lib_dir, self.sound_lib_database)
+        self.init_thread.finished.connect(self.move_database)
+        self.init_thread.start()
         
 
     def move_database(self):
         self.database = self.init_thread.database
         Logger.message("Database loaded successfully")
+        Logger.message("ENSISoundFinder is ready to use")
 
 
 

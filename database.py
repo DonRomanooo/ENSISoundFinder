@@ -5,6 +5,8 @@ import os, json, threading
 
 import convert
 
+from logger import Logger
+
 
 def init_database(sound_lib_path, database_path, **kwargs):
     # initialize the database
@@ -55,6 +57,10 @@ def load_database(database_path, **kwargs):
 
     db_files = os.listdir(database_path)
 
+    if len(db_files) == 0:
+        Logger.error("Database is empty. Try to reinitalize it using the settings menu and restart ENSISoundLoader")
+        return []
+
     progress_jump = 100.0 / len(db_files)
 
     progress = 0
@@ -77,7 +83,12 @@ def load_database(database_path, **kwargs):
                 database.append(element)
 
         progress += progress_jump
-        if progress_function: progress_function(round(progress))
+        progress_out = round(progress)
+
+        if progress_function: progress_function(progress_out)
+
+        if progress_out % 5 == 0 or progress_out == 1:
+            Logger.console_progress_bar(f"Loading database : ", f" {progress_out}%", progress_out, 20)
 
     
     return database

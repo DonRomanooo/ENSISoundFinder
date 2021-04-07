@@ -15,7 +15,7 @@ class Logger():
         now = datetime.now()
         current_time = now.strftime("%H:%M:%S")
 
-        sys.stdout.write("%s [INFO] : " % current_time + input)
+        sys.stdout.write(f"{current_time} [INFO] : {input}\n")
 
     @staticmethod
     def warning(input):
@@ -23,7 +23,7 @@ class Logger():
         now = datetime.now()
         current_time = now.strftime("%H:%M:%S")
 
-        sys.stdout.write("%s [WARNING] : " % current_time + input)
+        sys.stdout.write(f"{current_time} [WARNING] : {input}\n")
 
     @staticmethod
     def error(input):
@@ -31,13 +31,19 @@ class Logger():
         now = datetime.now()
         current_time = now.strftime("%H:%M:%S")
 
-        sys.stderr.write("%s [ERROR] : " % current_time + input)
+        sys.stderr.write(f"{current_time} [ERROR] : {input}\n")
 
     @staticmethod
     def console_progress_bar(prefix, suffix, progress, length):
         # Prints a progress bar to the console
+        now = datetime.now()
+        current_time = now.strftime("%H:%M:%S")
+
         iter = int(progress * length / 100.0)
-        bar = "\r{0}[{1}]{2}".format(prefix, (("#" * iter) + (" " * (length - iter))), suffix)
+
+        bar = f"\r{current_time} [INFO] : {prefix}[{(('#' * iter) + (' ' * (length - iter)))}]{suffix}"
+        if iter == length : bar += "\n"
+
         sys.stdout.write(bar)
 
     @staticmethod
