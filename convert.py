@@ -2,7 +2,7 @@
 
 # This file contains methods to convert the serie of pdf from SoundIdeasDef to json files
 
-import pdfplumber, json, sys, os, re, time
+import pdfplumber, json, sys, os, re, time, random
 from threading import Thread
 
 from logger import Logger

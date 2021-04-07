@@ -162,22 +162,22 @@ class App(QMainWindow):
 
         if len(self.selected_items) > 0 and ok:
             for s_item in self.selected_items:
-                for found_item in self.found_sounds:
-                    if s_item.text() == f"{found_item['Title']} {found_item['Description']}":
-                        
-                        filename = found_item["FileName"]
-                        dirname = self.current_working_directory
+                selected_item_id = s_item.data(256)
+                found_item = self.found_sounds[selected_item_id]
+        
+                filename = found_item["FileName"]
+                dirname = self.current_working_directory
 
-                        if not new_name.endswith(".wav") : new_name += ".wav"
+                if not new_name.endswith(".wav") : new_name += ".wav"
 
-                        copy_filename = os.path.join(dirname, new_name)
-                        
-                        if(os.path.exists(filename)):
-                            shutil.copy(filename, copy_filename)
-                            Logger.message(f"Copied {filename} to {copy_filename}")
+                copy_filename = os.path.join(dirname, new_name)
+                
+                if(os.path.exists(filename)):
+                    shutil.copy(filename, copy_filename)
+                    Logger.message(f"Copied {filename} to {copy_filename}")
 
-                        else:
-                            Logger.error(f"Can't copy {filename}, it does not exist")
+                else:
+                    Logger.error(f"Can't copy {filename}, it does not exist")
 
         else:
             Logger.warning("No item selected")
@@ -188,16 +188,17 @@ class App(QMainWindow):
 
         if len(self.selected_items) > 0:
             for s_item in self.selected_items:
-                for found_item in self.found_sounds:
-                    if s_item.text() == f"{found_item['Title']} {found_item['Description']}":
-                        
-                        filename = found_item["FileName"]
-                        
-                        if(os.path.exists(filename)):
-                            subprocess.Popen([filename], shell=True)
-                            Logger.message(f"Opened {filename}")
-                        else:
-                            Logger.error(f"Can't open {filename}, it does not exist")
+                
+                selected_item_id = s_item.data(256)
+                found_item = self.found_sounds[selected_item_id]
+
+                filename = found_item["FileName"]
+                
+                if(os.path.exists(filename)):
+                    subprocess.Popen([filename], shell=True)
+                    Logger.message(f"Opened {filename}")
+                else:
+                    Logger.error(f"Can't open {filename}, it does not exist")
 
         else:
             Logger.warning("No item selected")
@@ -221,8 +222,14 @@ class App(QMainWindow):
     def update_list(self):
         self.search_list.clear()
 
+        id = 0
+
         for item in self.found_sounds:
-            self.search_list.addItem(f"{item['Title']} {item['Description']}")
+            s = QListWidgetItem(f"{item['Title']} {item['Description']}")
+            s.setData(256, id)
+            self.search_list.addItem(s)
+
+            id += 1
 
 
     def initialize(self):
