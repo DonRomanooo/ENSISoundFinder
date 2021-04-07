@@ -17,7 +17,7 @@ for /F "tokens=* USEBACKQ" %%F in (`where git.exe`) do (
 
 rem find pip
 for /F "tokens=* USEBACKQ" %%F in (`where pip.exe`) do (
-    echo.%%F | findstr /C:"37">nul && (set pip=%%F)
+    echo.%%F | findstr /C:"3">nul && (set pip=%%F)
 )
 
 
@@ -36,7 +36,6 @@ if %lengthpip% gtr 2 if %lengthgit% gtr 2 (
     %pip% install pdfplumber
     %pip% install pyinstaller
 
-    cd %PROGRAMFILES%
     mkdir ENSISoundFinder
     cd ENSISoundFinder
     "%git%" clone "https://github.com/DonRomanooo/ENSISoundFinder.git" "git-clone"
