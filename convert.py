@@ -79,6 +79,8 @@ def convert_pdf_to_json(src_file, dest_file, **kwargs):
         if progress_out % 5 == 0 or progress_out == 1:
             Logger.console_progress_bar(f"Processing {src_file} : ", f" {progress_out}%", progress_out, 20)
 
+    sys.stdout.write("\n")
+
     with open(r"%s" % dest_file, "w") as output:
         json.dump(items, output, indent=2)
     
@@ -133,6 +135,7 @@ def convert_folder_to_database(folder_path, database_path, **kwargs):
                 if progress_out % 5 == 0 or progress_out == 1:
                     Logger.console_progress_bar(f"Processing {folder_path} : ", f" {progress_out}%", progress_out, 20)
 
+    sys.stdout.write("\n")
 
     output_filename = os.path.basename(folder_path) + ".json"
     output_file = os.path.join(database_path, output_filename.lower())

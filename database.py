@@ -1,7 +1,7 @@
 # Database #
 
 
-import os, json, threading
+import os, json, threading, sys
 
 import convert
 
@@ -90,6 +90,7 @@ def load_database(database_path, **kwargs):
         if progress_out % 5 == 0 or progress_out == 1:
             Logger.console_progress_bar(f"Loading database : ", f" {progress_out}%", progress_out, 20)
 
+    sys.stdout.write("\n")
     
     return database
 
