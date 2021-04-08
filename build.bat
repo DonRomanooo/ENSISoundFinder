@@ -9,4 +9,6 @@ for /F "tokens=* USEBACKQ" %%F in (`where pyinstaller.exe`) do (
     set pyinstaller=%%F
 )
 
-"%pyinstaller%" app.py --onefile --name ENSISoundFinder
+set /p buildver="Enter build version : "
+
+"%pyinstaller%" app.py --onefile --name ENSISoundFinder_%buildver%
