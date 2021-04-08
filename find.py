@@ -2,13 +2,16 @@
 
 
 import concurrent.futures
+import multiprocessing
 
 
 def match(element, tags):
     # find if tags match element keywords or not
     matches = 0
 
-    for tag in tags:
+    tags_set = set(tags)
+
+    for tag in tags_set:
         if tag in element["Keywords"]:
             matches += 1
     
@@ -22,7 +25,9 @@ def search(array, tags):
     # based on tags
     found = []
 
-    with concurrent.futures.ThreadPoolExecutor() as executor:
+    cpus = multiprocessing.cpu_count()
+
+    with concurrent.futures.ThreadPoolExecutor(cpus) as executor:
         futures = []
         for item in array:
             futures.append(executor.submit(match, element=item, tags=tags))

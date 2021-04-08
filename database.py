@@ -8,6 +8,18 @@ import convert
 from logger import Logger
 
 
+def process_database_folder(path, is_pdf, database_path):
+    # process either a folder or a pdf file to initialize the database
+    
+    if is_pdf:
+    # process a pdf file
+        convert.convert_pdf_to_json(path, database_path)
+    else:
+    # initialize any other folder found in the root dir of the sound_lib_path
+        convert.convert_folder_to_database(path, database_path)
+
+
+
 def init_database(sound_lib_path, database_path, **kwargs):
     # initialize the database
 
@@ -15,6 +27,8 @@ def init_database(sound_lib_path, database_path, **kwargs):
     message_function = kwargs.get("message", None)
 
     sound_library = os.listdir(sound_lib_path)
+
+    files_to_convert = []
 
     for folder in sound_library:
         current_folder_path = os.path.join(sound_lib_path, folder)
@@ -43,11 +57,40 @@ def init_database(sound_lib_path, database_path, **kwargs):
 
                         new_file = filename + ".json"
                         new_file_path = os.path.join(database_path, new_file)
-                        convert.convert_pdf_to_json(current_file_path, new_file_path, progress=progress_function, message=message_function)
+                        file_to_convert = {
+                            "Current Path" : current_file_path,
+                            "Database Path" : new_file_path,
+                            "Is PDF" : True
+                        }
+
+                        files_to_convert.append(file_to_convert)
 
         else:
         # initialize any other folder found in the root dir of the sound_lib_path
             convert.convert_folder_to_database(current_folder_path, database_path, progress=progress_function, message=message_function)
+            file_to_convert = {
+                            "Current Path" : current_folder_path,
+                            "Database Path" : database_path,
+                            "Is PDF" : False
+                        }
+
+            files_to_convert.append(file_to_convert)
+
+    thread_list = []
+
+    for item in files_to_convert:
+        thread = threading.Thread(target=process_database_folder, args=(item["Current Path"], item["Is PDF"], item["Database Path"],))
+        thread.daemon = True
+        thread_list.append(thread)
+
+    for thread in thread_list:
+        thread.start()
+
+    for thread in thread_list:
+        thread.join()
+
+    Logger.message("Database initialized")
+
 
 
 def load_database(database_path, **kwargs):
