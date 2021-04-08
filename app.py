@@ -364,6 +364,12 @@ QPushButton {
     border-style : double;
 }
 
+QPushButton:hover:!pressed
+{
+    color : rgba(255, 255, 255, 120);
+    background-color : rgba(255, 255, 255, 55);
+}
+
 QListView {
     background-color : rgb(30, 30, 30);
     color : rgba(255, 255, 255, 150);
