@@ -76,6 +76,8 @@ def init_database(sound_lib_path, database_path, **kwargs):
 
             files_to_convert.append(file_to_convert)
 
+    Logger.message(files_to_convert)
+
     thread_list = []
 
     for item in files_to_convert:
