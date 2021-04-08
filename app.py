@@ -106,6 +106,7 @@ class App(QMainWindow):
 
         self.set_working_dir_button = QPushButton("Select")
         self.set_working_dir_button.setMaximumWidth(70)
+        self.set_working_dir_button.setMinimumHeight(20)
         self.set_working_dir_button.clicked.connect(self.set_working_dir)
         working_dir_layout.addWidget(self.set_working_dir_button)
 
@@ -113,10 +114,13 @@ class App(QMainWindow):
         searchbar_layout = QHBoxLayout()
 
         self.input_tags = QLineEdit("Tags")
+        self.input_tags.setMinimumHeight(20)
         searchbar_layout.addWidget(self.input_tags)
 
         self.search_button = QPushButton("Search")
         self.search_button.setMaximumWidth(70)
+        self.search_button.setMinimumWidth(70)
+        self.search_button.setMinimumHeight(20)
         self.search_button.clicked.connect(self.search)
         searchbar_layout.addWidget(self.search_button)
 
@@ -127,10 +131,12 @@ class App(QMainWindow):
         tools_layout = QHBoxLayout()
 
         self.play_button = QPushButton("Open")
+        self.play_button.setMinimumHeight(20)
         self.play_button.clicked.connect(self.open)
         tools_layout.addWidget(self.play_button)
 
         self.copy_button = QPushButton("Copy")
+        self.copy_button.setMinimumHeight(20)
         self.copy_button.clicked.connect(self.copy)
         tools_layout.addWidget(self.copy_button)
 
@@ -338,12 +344,133 @@ class App(QMainWindow):
         Logger.message("Database loaded successfully")
         Logger.message("ENSISoundFinder is ready to use")
 
+stylesheet = """
+QMainWindow {
+    color : rgb(255, 30, 30);
+    border : 5 px solid black;
+}
 
+QWidget {
+    background-color : rgb(25, 25, 25);
+    color : rgb(200, 200, 200);
+    selection-color : rgb(150, 150, 150);
+    border-style : double;
+    border-color : rgb(50, 50, 50);
+}
+
+QPushButton {
+    background-color : rgb(30, 30, 30);
+    color : rgb(200, 200, 200);
+    border-style : double;
+}
+
+QListView {
+    background-color : rgb(30, 30, 30);
+    color : rgba(255, 255, 255, 150);
+}
+
+QListView::item:selected
+{
+    color : rgb(255, 255, 255);
+    background-color : rgb(100, 100, 100);
+}
+
+QListView::item:hover
+{
+    background-color : rgba(255, 255, 255, 50);
+}
+
+QLineEdit {
+    background-color : rgb(30, 30, 30);
+    color : rgb(200, 200, 200);
+}
+
+QScrollBar:vertical {              
+    border : none;
+    color : rgb(30, 30, 30);
+    width : 8px;
+    margin : 0px 0px 0px 0px;
+}
+
+QScrollBar::handle::vertical {
+    background-color : rgb(50, 50, 50);
+    min-height : 5px;
+    border-radius : 4px;
+}
+
+QScrollBar::add-line:vertical
+{
+    margin: 0px 3px 0px 3px;
+    border-image: url(:/qss_icons/rc/right_arrow_disabled.png);
+    width: 10px;
+    height: 10px;
+    subcontrol-position: right;
+    subcontrol-origin: margin;
+}
+
+QScrollBar::sub-line:vertical
+{
+    margin: 0px 3px 0px 3px;
+    border-image: url(:/qss_icons/rc/left_arrow_disabled.png);
+    height: 10px;
+    width: 10px;
+    subcontrol-position: left;
+    subcontrol-origin: margin;
+}
+
+QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical
+{
+    background: none;
+}
+
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical
+{
+    background: none;
+}
+
+QScrollBar:horizontal {              
+    border : none;
+    color : rgb(30, 30, 30);
+    height : 8px;
+    margin : 0px 0px 0px 0px;
+}
+
+QScrollBar::handle::horizontal {
+    background-color : rgb(50, 50, 50);
+    min-height : 5px;
+    border-radius : 4px;
+}
+
+QScrollBar::add-line:horizontal
+{
+    margin: 0px 3px 0px 3px;
+    border-image: url(:/qss_icons/rc/right_arrow_disabled.png);
+    width: 10px;
+    height: 10px;
+    subcontrol-position: right;
+    subcontrol-origin: margin;
+}
+
+QScrollBar::sub-line:horizontal
+{
+    margin: 0px 3px 0px 3px;
+    border-image: url(:/qss_icons/rc/left_arrow_disabled.png);
+    height: 10px;
+    width: 10px;
+    subcontrol-position: left;
+    subcontrol-origin: margin;
+}
+
+QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
+    background: none;
+}
+"""
 
 app = QApplication.instance() 
 if not app:
     app = QApplication(sys.argv)
-    
+    app.setStyleSheet(stylesheet)
+
 application = App()
 application.show()
 
