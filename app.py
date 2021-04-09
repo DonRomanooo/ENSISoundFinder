@@ -1,6 +1,9 @@
 # Application #
 
-import sys, os, json, time, shutil, subprocess
+import sys, os, json, time, shutil, subprocess, multiprocessing
+
+multiprocessing.freeze_support()
+
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -472,12 +475,13 @@ QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
 }
 """
 
-app = QApplication.instance() 
-if not app:
-    app = QApplication(sys.argv)
-    app.setStyleSheet(stylesheet)
+if __name__ == "__main__":
+    app = QApplication.instance() 
+    if not app:
+        app = QApplication(sys.argv)
+        app.setStyleSheet(stylesheet)
 
-application = App()
-application.show()
+    application = App()
+    application.show()
 
-app.exec_()
+    app.exec_()

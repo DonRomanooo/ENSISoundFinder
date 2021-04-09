@@ -1,22 +1,24 @@
 # Database #
 
 
-import os, json, threading, sys
+import os, json, concurrent.futures, sys, multiprocessing, time
 
 import convert
 
 from logger import Logger
 
 
-def process_database_folder(path, is_pdf, database_path):
+def process_database_folder(item):
     # process either a folder or a pdf file to initialize the database
-    
-    if is_pdf:
+
+    if item["Is PDF"]:
     # process a pdf file
-        convert.convert_pdf_to_json(path, database_path)
+        convert.convert_pdf_to_json(item["Current Path"], item["Database Path"])
     else:
     # initialize any other folder found in the root dir of the sound_lib_path
-        convert.convert_folder_to_database(path, database_path)
+        convert.convert_folder_to_database(item["Current Path"], item["Database Path"])
+
+    return True
 
 
 
@@ -76,20 +78,42 @@ def init_database(sound_lib_path, database_path, **kwargs):
 
             files_to_convert.append(file_to_convert)
 
-    Logger.message(files_to_convert)
 
-    thread_list = []
+    cpus = multiprocessing.cpu_count()
+    pool = multiprocessing.Pool(cpus)
 
-    for item in files_to_convert:
-        thread = threading.Thread(target=process_database_folder, args=(item["Current Path"], item["Is PDF"], item["Database Path"],))
-        thread.daemon = True
-        thread_list.append(thread)
+    progress = 0
+    progress_step = 100.0 / len(files_to_convert)
 
-    for thread in thread_list:
-        thread.start()
+    job = pool.map_async(process_database_folder, files_to_convert)
 
-    for thread in thread_list:
-        thread.join()
+    while job._number_left > 0:
+        progress = progress_step * (len(files_to_convert) - job._number_left)
+        Logger.console_progress_bar(f"Progress : ", f" {round(progress)}%", round(progress), 20)
+
+    if job._number_left == 0:
+        Logger.console_progress_bar(f"Progress : ", f" {round(100)}%", round(100), 20)
+
+    pool.close()
+    pool.join()
+
+    sys.stdout.write("\n")
+
+    # with concurrent.futures.ThreadPoolExecutor(cpus) as executor:
+    #     futures = []
+    #     progress = 0
+    #     progress_step = 100.0 / len(files_to_convert)
+
+    #     for item in files_to_convert:
+    #         futures.append(executor.submit(process_database_folder, path=item["Current Path"], is_pdf=item["Is PDF"], database_path=item["Database Path"]))
+    #     for future in concurrent.futures.as_completed(futures):
+
+    #         if future.result():
+    #             progress += progress_step
+    #             Logger.console_progress_bar(f"Progress : {round(progress)}%", "", round(progress), 20)
+    #             continue
+
+    # sys.stdout.write("\n")
 
     Logger.message("Database initialized")
 
