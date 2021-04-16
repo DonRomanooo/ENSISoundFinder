@@ -41,7 +41,7 @@ class Logger():
 
         iter = int(progress * length / 100.0)
 
-        bar = f"\r{current_time} [INFO] : {prefix}[{(('#' * iter) + (' ' * (length - iter)))}]{suffix}"
+        bar = f"\r{current_time} [INFO] : {prefix}|{(('█' * iter) + (' ' * (length - iter)))}|{suffix}"
 
         sys.stdout.write(bar)
 
