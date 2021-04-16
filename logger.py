@@ -1,5 +1,6 @@
 import sys, os, time
 from datetime import datetime
+from colorama import Fore
 
 
 def __init():
@@ -15,7 +16,7 @@ class Logger():
         now = datetime.now()
         current_time = now.strftime("%H:%M:%S")
 
-        sys.stdout.write(f"{current_time} [INFO] : {input}\n")
+        sys.stdout.write(f"{Fore.WHITE}{current_time} [INFO] : {input}\n")
 
     @staticmethod
     def warning(input):
@@ -23,7 +24,7 @@ class Logger():
         now = datetime.now()
         current_time = now.strftime("%H:%M:%S")
 
-        sys.stdout.write(f"{current_time} [WARNING] : {input}\n")
+        sys.stdout.write(f"{Fore.YELLOW}{current_time} [WARNING] : {input}\n")
 
     @staticmethod
     def error(input):
@@ -31,7 +32,7 @@ class Logger():
         now = datetime.now()
         current_time = now.strftime("%H:%M:%S")
 
-        sys.stderr.write(f"{current_time} [ERROR] : {input}\n")
+        sys.stderr.write(f"{Fore.RED}{current_time} [ERROR] : {input}\n")
 
     @staticmethod
     def console_progress_bar(prefix, suffix, progress, length):
@@ -41,7 +42,7 @@ class Logger():
 
         iter = int(progress * length / 100.0)
 
-        bar = f"\r{current_time} [INFO] : {prefix}|{(('█' * iter) + (' ' * (length - iter)))}|{suffix}"
+        bar = f"\r{Fore.WHITE}{current_time} [INFO] : {prefix}|{(('█' * iter) + (' ' * (length - iter)))}|{suffix}"
 
         sys.stdout.write(bar)
 

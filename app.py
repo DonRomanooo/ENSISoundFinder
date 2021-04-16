@@ -1,8 +1,9 @@
 # Application #
 
-import sys, os, json, time, shutil, subprocess, multiprocessing
+import sys, os, json, time, shutil, subprocess, multiprocessing, colorama
 
 multiprocessing.freeze_support()
+colorama.init()
 
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
@@ -10,6 +11,7 @@ from PyQt5.QtGui import *
 
 import database, find
 from logger import Logger
+
 
 
 class InitThread(QThread):
@@ -277,12 +279,15 @@ class App(QMainWindow):
             # self.init_popup.add_message("Initializing database...")
 
             # self.progress_popup = Popup("Progress", has_message=True, message = "Progress", has_progress_bar=True)
-            Logger.message("Initializing database...")
-            self.init_thread = InitThread(self.sound_lib_dir, self.sound_lib_database)
-            # self.init_thread.update.connect(self.progress_popup.set_progress_status)
-            self.init_thread.finished.connect(self.move_database)
-            self.init_thread.start()
-        
+            if not os.path.exists(self.sound_lib_dir):
+                Logger.error(f"Selected path does not exist. Please select a valid folder using the menu Settings/Initialize Database") 
+            else:
+                Logger.message("Initializing database...")
+                self.init_thread = InitThread(self.sound_lib_dir, self.sound_lib_database)
+                # self.init_thread.update.connect(self.progress_popup.set_progress_status)
+                self.init_thread.finished.connect(self.move_database)
+                self.init_thread.start()
+            
         elif not os.path.exists(self.sound_lib_database):
             Logger.warning("Database not found, initializing it...")
 
@@ -326,34 +331,37 @@ class App(QMainWindow):
 
         self.sound_lib_dir = data["SOUND_LIB_PATH"]
 
-        if self.sound_lib_dir == "":
-            dlg = QFileDialog()
-            dlg.setFileMode(QFileDialog.Directory)
+        dlg = QFileDialog()
+        dlg.setFileMode(QFileDialog.Directory)
 
-            self.sound_lib_dir = dlg.getExistingDirectory(self, "Select the sound library directory")
+        self.sound_lib_dir = dlg.getExistingDirectory(self, "Select the sound library directory")
 
+        if not os.path.exists(self.sound_lib_dir):
+            Logger.error("Selected path does not exist, try again")
+        
+        else:
             data["SOUND_LIB_PATH"] = self.sound_lib_dir
 
             with open(self.pref_file, "w") as f:
                 json.dump(data, f, indent=2) 
 
-            Logger.message(f"Sound Libray path has been set to {self.sound_lib_dir}")
+            Logger.message(f"Sound libray path has been set to {self.sound_lib_dir}")
 
-        if os.path.exists(self.sound_lib_database):
-            try:
-                Logger.message("Removing old database...")
-                shutil.rmtree(self.sound_lib_database)
+            if os.path.exists(self.sound_lib_database):
+                try:
+                    Logger.message("Removing old database...")
+                    shutil.rmtree(self.sound_lib_database)
+                    os.makedirs(self.sound_lib_database)
+                except Exception as e:
+                    Logger.error(e)
+            else:
                 os.makedirs(self.sound_lib_database)
-            except Exception as e:
-                Logger.error(e)
-        else:
-            os.makedirs(self.sound_lib_database)
-        
-        Logger.message("Initializing the new database...")
-        self.init_thread = InitThread(self.sound_lib_dir, self.sound_lib_database)
-        self.init_thread.finished.connect(self.move_database)
-        self.init_thread.start()
-        
+            
+            Logger.message("Initializing the new database...")
+            self.init_thread = InitThread(self.sound_lib_dir, self.sound_lib_database)
+            self.init_thread.finished.connect(self.move_database)
+            self.init_thread.start()
+            
 
     def move_database(self):
         self.database = self.init_thread.database
@@ -496,3 +504,5 @@ if __name__ == "__main__":
     application.show()
 
     app.exec_()
+
+    colorama.deinit()
