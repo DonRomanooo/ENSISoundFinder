@@ -164,7 +164,7 @@ class App(QMainWindow):
     def copy(self):
         self.selected_items = self.search_list.selectedItems()
 
-        new_name, ok = QInputDialog.getText(self, "Copy File", "Set he new filename :")
+        new_name, ok = QInputDialog.getText(self, "Copy File", "Set the new filename :")
 
         if len(self.selected_items) > 0 and ok:
             for s_item in self.selected_items:
@@ -323,6 +323,19 @@ class App(QMainWindow):
 
         self.sound_lib_dir = data["SOUND_LIB_PATH"]
 
+        if self.sound_lib_dir == "":
+            dlg = QFileDialog()
+            dlg.setFileMode(QFileDialog.Directory)
+
+            self.sound_lib_dir = dlg.getExistingDirectory(self, "Select the sound library directory")
+
+            data["SOUND_LIB_PATH"] = self.sound_lib_dir
+
+            with open(self.pref_file, "w") as f:
+                json.dump(data, f, indent=2) 
+
+            Logger.message(f"Sound Libray path has been set to {self.sound_lib_dir}")
+
         if os.path.exists(self.sound_lib_database):
             try:
                 Logger.message("Removing old database...")
@@ -341,8 +354,6 @@ class App(QMainWindow):
 
     def move_database(self):
         self.database = self.init_thread.database
-        Logger.message("Database loaded successfully")
-        Logger.message("ENSISoundFinder is ready to use")
 
 stylesheet = """
 QMainWindow {

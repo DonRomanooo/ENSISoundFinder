@@ -136,6 +136,9 @@ def load_database(database_path, **kwargs):
             Logger.console_progress_bar(f"Loading database : ", f" {progress_out}%", progress_out, 20)
 
     sys.stdout.write("\n")
+
+    Logger.message("Database loaded successfully")
+    Logger.message("ENSISoundFinder is ready to use")
     
     return database
 
